@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/spf13/viper"
 	"log"
+	"os"
 )
 
 type Config struct {
@@ -11,8 +12,14 @@ type Config struct {
 }
 
 func (c *Config) GetConfig(configPath string) {
+	_, err := os.Stat(configPath)
+	if err !=nil{
+		log.Print("Config file does not exist! Please check")
+		os.Exit(1)
+	}
+
 	viper.SetConfigFile(configPath)
-	err := viper.ReadInConfig()
+	err = viper.ReadInConfig()
 	if err != nil {
 		log.Printf("%v\n", err)
 	}
@@ -20,13 +27,13 @@ func (c *Config) GetConfig(configPath string) {
 		c.host = viper.Get("service.host").(string)
 	} else {
 		log.Printf("Service ip not set! Please Check")
-		return
+		os.Exit(1)
 	}
 	if viper.IsSet("service.port") {
 		c.port = viper.Get("service.port").(int)
 	} else {
 		log.Printf("Service port not set! Please Check")
-		return
+		os.Exit(1)
 	}
 }
 

@@ -89,7 +89,7 @@ func CountFibonacciRecursive(w http.ResponseWriter, r *http.Request) {
 	data := &Body{}
 	json.Unmarshal(body, data)
 
-	if data.From > data.To || data.From < 0 || data.To < 0 {
+	if data.From > data.To || data.From <= 0 || data.To <= 0 {
 		log.Printf("Fishy arguments from: %d to: %d", data.From, data.To)
 
 		w.WriteHeader(http.StatusBadRequest)
@@ -104,6 +104,7 @@ func CountFibonacciRecursive(w http.ResponseWriter, r *http.Request) {
 	for i := data.From; i <= data.To; i++ {
 		response[i] = fibonacciBig(i).String()
 	}
+	log.Print(response)
 
 	payload, _ := json.Marshal(response)
 	w.Header().Set("Content-Type", "application/json")
