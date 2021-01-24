@@ -2,6 +2,7 @@ package calculator
 
 import (
 	"encoding/json"
+	"github.com/TawR1024/FibonacciApi/connector"
 	"io/ioutil"
 	"log"
 	"math"
@@ -114,8 +115,14 @@ func fibonacciBig(n int) *big.Int {
 	if n == 1 || n == 2 {
 		return big.NewInt(1)
 	}
-	prev := fibonacciBig(n - 1)
-	prev2 := fibonacciBig(n - 2)
-	prev.Add(prev, prev2)
-	return prev
+	ifCached := connector.GetBigKey(n) // check if cached
+	if ifCached == nil {
+		prev := fibonacciBig(n - 1)
+		prev2 := fibonacciBig(n - 2)
+		prev.Add(prev, prev2)
+		connector.SetBigKey(n, *prev)
+		return prev
+	} else {
+		return ifCached
+	}
 }

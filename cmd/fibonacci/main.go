@@ -20,7 +20,7 @@ func main() {
 	router.Use(middleware.Timeout(5 * time.Second))
 
 	router.Get("/fibonacci_small", calculator.CountFibonacciBinet)
-	router.Get("/fibonacci_big", calculator.CountFibonacciRecurcive)
+	router.Get("/fibonacci_big", calculator.CountFibonacciRecursive)
 
 	http.ListenAndServe(conf.GetHost()+":"+strconv.Itoa(conf.GetPort()), router)
 }
