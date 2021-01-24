@@ -36,9 +36,7 @@ func CountFibonacciBinet(w http.ResponseWriter, r *http.Request) {
 	}
 	data := &Body{}
 	err = json.Unmarshal(body, data)
-	if err !=nil{
 
-	}
 	if data.From > data.To || data.From < 0 || data.To < 0 {
 		log.Printf("Fishy arguments from: %d to: %d", data.From, data.To)
 
@@ -65,7 +63,6 @@ func CountFibonacciBinet(w http.ResponseWriter, r *http.Request) {
 	}
 	payload, _ := json.Marshal(response)
 	w.Header().Set("Content-Type", "application/json")
-	log.Print("Send Data to user")
 	w.Write(payload)
 }
 
@@ -75,12 +72,13 @@ func fibonacci(w *sync.WaitGroup, c *chan map[int]float64, n int) {
 	*c <- a
 }
 
+// Binet Formula
 func binet(n int) float64 {
 	f := (math.Pow((1+sqrtOfFive)/2, float64(n)) - math.Pow((1-sqrtOfFive)/2, float64(n))) / sqrtOfFive
 	return math.Round(f)
 }
 
-func CountFibonacciRecurcive(w http.ResponseWriter, r *http.Request) {
+func CountFibonacciRecursive(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if r.Body == nil {
@@ -89,24 +87,29 @@ func CountFibonacciRecurcive(w http.ResponseWriter, r *http.Request) {
 	}
 	data := &Body{}
 	json.Unmarshal(body, data)
-	if data.From > data.To {
-		w.Write([]byte("BAD REQUEST"))
-		return
-	}
-	if data.From < 0 || data.To < 0 {
-		w.Write([]byte("BAD REQUEST"))
+
+	if data.From > data.To || data.From < 0 || data.To < 0 {
+		log.Printf("Fishy arguments from: %d to: %d", data.From, data.To)
+
+		w.WriteHeader(http.StatusBadRequest)
+		_, err := w.Write([]byte("Bad params! to must be greater than from, both wars must be positive"))
+		if err != nil {
+			log.Printf("Response error %v", err)
+		}
 		return
 	}
 	response := make(map[int]string)
+
 	for i := data.From; i <= data.To; i++ {
 		response[i] = fibonacciBig(i).String()
 	}
+
 	payload, _ := json.Marshal(response)
 	w.Header().Set("Content-Type", "application/json")
-	log.Print("Send Data to user")
 	w.Write(payload)
 }
 
+// Recursive fibonacci formula
 func fibonacciBig(n int) *big.Int {
 	if n == 1 || n == 2 {
 		return big.NewInt(1)
@@ -115,5 +118,4 @@ func fibonacciBig(n int) *big.Int {
 	prev2 := fibonacciBig(n - 2)
 	prev.Add(prev, prev2)
 	return prev
-
 }

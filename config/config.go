@@ -6,8 +6,8 @@ import (
 )
 
 type Config struct {
-	host      string `yaml:"host"`
-	port      int    `yaml:"port"`
+	host string `yaml:"host"`
+	port int    `yaml:"port"`
 }
 
 func (c *Config) GetConfig(configPath string) {
@@ -36,5 +36,3 @@ func (c *Config) GetPort() int {
 func (c *Config) GetHost() string {
 	return c.host
 }
-
-
