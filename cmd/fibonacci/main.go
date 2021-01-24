@@ -12,9 +12,7 @@ import (
 
 var conf config.Config
 
-func main(){
-
-
+func main() {
 
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
@@ -23,7 +21,6 @@ func main(){
 
 	router.Get("/fibonacci_small", calculator.CountFibonacciBinet)
 	router.Get("/fibonacci_big", calculator.CountFibonacciRecurcive)
-
 
 	http.ListenAndServe(conf.GetHost()+":"+strconv.Itoa(conf.GetPort()), router)
 }
