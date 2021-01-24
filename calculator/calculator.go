@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math"
+	"math/big"
 	"net/http"
 	"sync"
 )
@@ -77,4 +78,42 @@ func fibonacci(w *sync.WaitGroup, c *chan map[int]float64, n int) {
 func binet(n int) float64 {
 	f := (math.Pow((1+sqrtOfFive)/2, float64(n)) - math.Pow((1-sqrtOfFive)/2, float64(n))) / sqrtOfFive
 	return math.Round(f)
+}
+
+func CountFibonacciRecurcive(w http.ResponseWriter, r *http.Request) {
+	body, _ := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if r.Body == nil {
+		http.Error(w, "Range is empty!", 400)
+		return
+	}
+	data := &Body{}
+	json.Unmarshal(body, data)
+	if data.From > data.To {
+		w.Write([]byte("BAD REQUEST"))
+		return
+	}
+	if data.From < 0 || data.To < 0 {
+		w.Write([]byte("BAD REQUEST"))
+		return
+	}
+	response := make(map[int]string)
+	for i := data.From; i <= data.To; i++ {
+		response[i] = fibonacciBig(i).String()
+	}
+	payload, _ := json.Marshal(response)
+	w.Header().Set("Content-Type", "application/json")
+	log.Print("Send Data to user")
+	w.Write(payload)
+}
+
+func fibonacciBig(n int) *big.Int {
+	if n == 1 || n == 2 {
+		return big.NewInt(1)
+	}
+	prev := fibonacciBig(n - 1)
+	prev2 := fibonacciBig(n - 2)
+	prev.Add(prev, prev2)
+	return prev
+
 }
