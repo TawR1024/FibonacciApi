@@ -13,27 +13,29 @@ import (
 	"time"
 )
 
-var conf config.Config
+var conf *config.Config
 
 func main() {
+
 	var configFilePath = flag.String("config", "configFile", "Setting the configuration file")
 	flag.Parse()
-
 	_, err := os.Stat(*configFilePath)
 	if err == nil {
-		conf.GetConfig(*configFilePath)
+		log.Printf("Using custom config path: %s", *configFilePath)
+		conf, _ = config.New(configFilePath)
 	} else {
-		log.Print("using default config path")
-		conf.GetConfig("/etc/fibonacci/config.yaml") // load config from default config path
-	}
 
+		defaultPath := "/etc/fibonacci/config.yaml" // load config from default config path
+		log.Printf("Using default config path: %s", defaultPath)
+		conf, _ = config.New(&defaultPath)
+	}
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.Timeout(5 * time.Second))
 
-	router.Get("/fibonacci_small", calculator.CountFibonacciBinet)
-	router.Get("/fibonacci_big", calculator.CountFibonacciRecursive)
+	router.Get("/fibonacci_small", calculator.New(conf).CountFibonacciBinet)
+	router.Get("/fibonacci_big", calculator.New(conf).CountFibonacciRecursive)
 
-	http.ListenAndServe(conf.GetHost()+":"+strconv.Itoa(conf.GetPort()), router)
+	log.Fatal(http.ListenAndServe(conf.GetHost()+":"+strconv.Itoa(conf.GetPort()), router))
 }

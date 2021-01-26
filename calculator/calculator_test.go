@@ -1,6 +1,7 @@
 package calculator
 
 import (
+	"github.com/TawR1024/FibonacciApi/config"
 	"math/big"
 	"testing"
 )
@@ -29,6 +30,9 @@ func Test_binet(t *testing.T) {
 }
 
 func Test_fibonacciBig(t *testing.T) {
+	configPath := "/etc/fibonacci/conf.yaml"
+	conf, _ := config.New(&configPath)
+
 	f1 := big.NewInt(1)
 	f2 := big.NewInt(1)
 
@@ -41,7 +45,7 @@ func Test_fibonacciBig(t *testing.T) {
 	f124 := big.NewInt(1)
 	f124.SetString("36726740705505779255899443", 10)
 
-	f0 := big.NewInt(10)
+	f0 := big.NewInt(0)
 	tests := []struct {
 		name     string
 		position int
@@ -57,7 +61,7 @@ func Test_fibonacciBig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := fibonacciBig(tt.position)
+			got := New(conf).fibonacciBig(tt.position)
 			if got.String() != tt.want.String() {
 				t.Errorf("fibonacciBig() = %v, want %v", got, tt.want)
 			}

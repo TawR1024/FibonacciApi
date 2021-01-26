@@ -2,6 +2,7 @@ package calculator
 
 import (
 	"encoding/json"
+	"github.com/TawR1024/FibonacciApi/config"
 	"github.com/TawR1024/FibonacciApi/connector"
 	"io/ioutil"
 	"log"
@@ -17,8 +18,14 @@ type Body struct {
 	From int `json:"from"`
 	To   int `json:"to"`
 }
+type Config struct {
+	*config.Config
+}
 
-func CountFibonacciBinet(w http.ResponseWriter, r *http.Request) {
+func New(configuration *config.Config) *Config {
+	return &Config{configuration}
+}
+func (config *Config) CountFibonacciBinet(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 
@@ -37,12 +44,20 @@ func CountFibonacciBinet(w http.ResponseWriter, r *http.Request) {
 	}
 	data := &Body{}
 	err = json.Unmarshal(body, data)
-
+	if err != nil {
+		log.Printf("Can`t unmarshal request body in CountFibonacciBinet() %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		_, err := w.Write([]byte("Bad params! to must be greater than from, both vars must be positive"))
+		if err != nil {
+			log.Printf("Response error %v", err)
+		}
+		return
+	}
 	if data.From > data.To || data.From < 0 || data.To < 0 {
 		log.Printf("Fishy arguments from: %d to: %d", data.From, data.To)
 
 		w.WriteHeader(http.StatusBadRequest)
-		_, err = w.Write([]byte("Bad params! to must be greater than from, both wars must be positive"))
+		_, err = w.Write([]byte("Bad params! to must be greater than from, both vars must be positive"))
 		if err != nil {
 			log.Printf("Response error %v", err)
 		}
@@ -79,7 +94,7 @@ func binet(n int) float64 {
 	return math.Round(f)
 }
 
-func CountFibonacciRecursive(w http.ResponseWriter, r *http.Request) {
+func (config *Config) CountFibonacciRecursive(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
 	if r.Body == nil {
@@ -87,13 +102,21 @@ func CountFibonacciRecursive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	data := &Body{}
-	json.Unmarshal(body, data)
-
+	err := json.Unmarshal(body, data)
+	if err != nil {
+		log.Printf("Can`t unmarshal request body in CountFibonacciRecursive() %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		_, err := w.Write([]byte("Bad params! to must be greater than from, both vars must be positive"))
+		if err != nil {
+			log.Printf("Response error %v", err)
+		}
+		return
+	}
 	if data.From > data.To || data.From <= 0 || data.To <= 0 {
 		log.Printf("Fishy arguments from: %d to: %d", data.From, data.To)
 
 		w.WriteHeader(http.StatusBadRequest)
-		_, err := w.Write([]byte("Bad params! to must be greater than from, both wars must be positive"))
+		_, err := w.Write([]byte("Bad params! to must be greater than from, both vars must be positive"))
 		if err != nil {
 			log.Printf("Response error %v", err)
 		}
@@ -102,7 +125,7 @@ func CountFibonacciRecursive(w http.ResponseWriter, r *http.Request) {
 	response := make(map[int]string)
 
 	for i := data.From; i <= data.To; i++ {
-		response[i] = fibonacciBig(i).String()
+		response[i] = config.fibonacciBig(i).String()
 	}
 	log.Print(response)
 
@@ -112,16 +135,19 @@ func CountFibonacciRecursive(w http.ResponseWriter, r *http.Request) {
 }
 
 // Recursive fibonacci formula
-func fibonacciBig(n int) *big.Int {
+func (config *Config) fibonacciBig(n int) *big.Int {
+	if n == 0 {
+		return big.NewInt(0)
+	}
 	if n == 1 || n == 2 {
 		return big.NewInt(1)
 	}
-	ifCached := connector.GetBigKey(n) // check if cached
+	ifCached := connector.GetBigKey(config.RedisClient, n) // check if cached
 	if ifCached == nil {
-		prev := fibonacciBig(n - 1)
-		prev2 := fibonacciBig(n - 2)
+		prev := config.fibonacciBig(n - 1)
+		prev2 := config.fibonacciBig(n - 2)
 		prev.Add(prev, prev2)
-		connector.SetBigKey(n, *prev)
+		connector.SetBigKey(config.RedisClient, n, *prev)
 		return prev
 	} else {
 		return ifCached
