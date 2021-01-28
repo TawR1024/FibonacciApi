@@ -26,9 +26,13 @@ func New(configuration *config.Config) *Config {
 	return &Config{configuration}
 }
 func (config *Config) CountFibonacciBinet(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadAll(r.Body)
+	if r.Body == nil {
+		http.Error(w, "Range is empty!", 400)
+		return
+	}
 	defer r.Body.Close()
 
+	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Print("Request body read error")
 		w.WriteHeader(http.StatusBadRequest)
@@ -38,10 +42,6 @@ func (config *Config) CountFibonacciBinet(w http.ResponseWriter, r *http.Request
 		}
 	}
 
-	if r.Body == nil {
-		http.Error(w, "Range is empty!", 400)
-		return
-	}
 	data := &Body{}
 	err = json.Unmarshal(body, data)
 	if err != nil {
@@ -96,11 +96,11 @@ func binet(n int) float64 {
 
 func (config *Config) CountFibonacciRecursive(w http.ResponseWriter, r *http.Request) {
 	body, _ := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
 	if r.Body == nil {
 		http.Error(w, "Range is empty!", 400)
 		return
 	}
+	defer r.Body.Close()
 	data := &Body{}
 	err := json.Unmarshal(body, data)
 	if err != nil {
