@@ -2,15 +2,16 @@ package main
 
 import (
 	"flag"
-	"github.com/TawR1024/FibonacciApi/calculator"
-	"github.com/TawR1024/FibonacciApi/config"
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/TawR1024/FibonacciApi/calculator"
+	"github.com/TawR1024/FibonacciApi/config"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 )
 
 var conf *config.Config
@@ -24,8 +25,12 @@ func main() {
 		log.Printf("Using custom config path: %s", *configFilePath)
 		conf, _ = config.New(configFilePath)
 	} else {
-
 		defaultPath := "/etc/fibonacci/config.yaml" // load config from default path
+		_, err := os.Stat(defaultPath)
+		if err != nil {
+			log.Printf("Default config not exist: %s", defaultPath)
+			os.Exit(1)
+		}
 		log.Printf("Using default config path: %s", defaultPath)
 		conf, _ = config.New(&defaultPath)
 	}

@@ -91,7 +91,7 @@ redis:
 ## goreleaser
 
 Для обеспечения постоянной сборки приложения под различные платформы при необходимости 
-настроен  [pipeline](.github/workflows/releaseFibonacci.yml)
+настроен  [pipeline](.github/workflows/releaseFibonacchi.yml)
 
 Для деплоя приложения достаточно скачать необходимый архив.
 
@@ -100,7 +100,7 @@ redis:
 Запуск приложения можно осуществить в docker контейнере.
 Каждая новая версия собирается и загружается на docker.hub
 
-[pipeline](.github/workflows/build_image.yml)
+[pipeline](.github/workflows/buid_image.yml)
 
 ```bash
 docker pull tawr/fibonacciapi
