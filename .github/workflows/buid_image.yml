@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - dev
+      - master
+    tags:
+      - "*"
 
 jobs:
 
@@ -31,7 +34,7 @@ jobs:
           context: ./
           file: ./Dockerfile
           push: true
-          tags: tawr/fiboapi:latest
+          tags: ${{secrets.DOCKER_HUB_USERNAME}}/fibonacciapi:latest
 
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}

@@ -2,14 +2,15 @@ package calculator
 
 import (
 	"encoding/json"
-	"github.com/TawR1024/FibonacciApi/config"
-	"github.com/TawR1024/FibonacciApi/connector"
 	"io/ioutil"
 	"log"
 	"math"
 	"math/big"
 	"net/http"
 	"sync"
+
+	"github.com/TawR1024/FibonacciApi/config"
+	"github.com/TawR1024/FibonacciApi/connector"
 )
 
 var sqrtOfFive = math.Sqrt(5)
@@ -63,6 +64,7 @@ func (config *Config) CountFibonacciBinet(w http.ResponseWriter, r *http.Request
 		}
 		return
 	}
+
 	var wg sync.WaitGroup
 	dataChannel := make(chan map[int]float64, data.To-data.From+1)
 	for i := data.From; i <= data.To; i++ {
@@ -77,9 +79,14 @@ func (config *Config) CountFibonacciBinet(w http.ResponseWriter, r *http.Request
 			response[k] = v
 		}
 	}
+
 	payload, _ := json.Marshal(response)
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(payload)
+	_, err = w.Write(payload)
+	if err != nil {
+		log.Printf("Response error %v", err)
+	}
+	return
 }
 
 func fibonacci(w *sync.WaitGroup, c *chan map[int]float64, n int) {
@@ -101,6 +108,7 @@ func (config *Config) CountFibonacciRecursive(w http.ResponseWriter, r *http.Req
 		return
 	}
 	defer r.Body.Close()
+
 	data := &Body{}
 	err := json.Unmarshal(body, data)
 	if err != nil {
@@ -131,7 +139,11 @@ func (config *Config) CountFibonacciRecursive(w http.ResponseWriter, r *http.Req
 
 	payload, _ := json.Marshal(response)
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(payload)
+	_, err = w.Write(payload)
+	if err != nil {
+		log.Printf("Response error %v", err)
+	}
+	return
 }
 
 // Recursive fibonacci formula
