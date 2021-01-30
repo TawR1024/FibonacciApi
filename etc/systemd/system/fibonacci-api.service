@@ -1,0 +1,16 @@
+[Unit]
+Description=Fibonacci calculation service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/fibonacciApi
+WorkingDirectory=/etc/fibonacci/
+Restart=on-failure
+RestartSec=10s
+User=fibonacci
+Group=fibonacci
+UMask=077
+
+[Install]
+WantedBy=multi-user.target

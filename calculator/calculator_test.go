@@ -1,9 +1,10 @@
 package calculator
 
 import (
-	"github.com/TawR1024/FibonacciApi/config"
 	"math/big"
 	"testing"
+
+	"github.com/TawR1024/FibonacciApi/config"
 )
 
 func Test_binet(t *testing.T) {
@@ -30,7 +31,7 @@ func Test_binet(t *testing.T) {
 }
 
 func Test_fibonacciBig(t *testing.T) {
-	configPath := "/etc/fibonacci/conf.yaml"
+	configPath := "/etc/fibonacci/config.yaml"
 	conf, _ := config.New(&configPath)
 
 	f1 := big.NewInt(1)

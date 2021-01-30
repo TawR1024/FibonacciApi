@@ -72,3 +72,16 @@ service:
 ```
 
 # Service deployment
+
+## Ручная сборка и запуск как systemd unit
+
+1. ```bash git clone https://github.com/TawR1024/FibonacciApi/```
+2. ```bash cd FibonacciApi/cmd/fibonacchi```
+3. ```bash go build -o fibonacciApi .```
+4. ```bash mv fibonacchiApi /usr/share/bin```
+5. Создаём описание юнита см /etc/systemd/system/fibonacci-api.service
+6. Добавляем юнит ```bash systemct daemon-reload```
+7. Создаём пользователя и группу ```bash useradd fibonacci```
+8. Запускаем systemctl start fibonacci-api.service
+
+

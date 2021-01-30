@@ -25,10 +25,11 @@ func main() {
 		conf, _ = config.New(configFilePath)
 	} else {
 
-		defaultPath := "/etc/fibonacci/config.yaml" // load config from default config path
+		defaultPath := "/etc/fibonacci/config.yaml" // load config from default path
 		log.Printf("Using default config path: %s", defaultPath)
 		conf, _ = config.New(&defaultPath)
 	}
+
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
