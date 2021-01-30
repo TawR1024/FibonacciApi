@@ -120,7 +120,7 @@ func (config *Config) CountFibonacciRecursive(w http.ResponseWriter, r *http.Req
 		}
 		return
 	}
-	if data.From > data.To || data.From <= 0 || data.To <= 0 {
+	if data.From > data.To || data.From < 0 || data.To < 0 {
 		log.Printf("Fishy arguments from: %d to: %d", data.From, data.To)
 
 		w.WriteHeader(http.StatusBadRequest)
