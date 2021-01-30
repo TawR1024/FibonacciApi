@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  redis:
+    image: redis
+  api:
+    image: tawr/fibonacciapi
+    ports:
+      - "3000:3000"
+      - "6379:6379"
+    volumes:
+      - /path/to/config/dir:/etc/fibonacci/
+    depends_on:
+      - redis

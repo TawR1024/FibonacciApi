@@ -119,6 +119,25 @@ service:
   host: 0.0.0.0
 ```
 
+## Запуск связки fibonacciapi + redis
+
+Для простоты запуска всех необходимых компонентов, api + redis как сервис кеширования, подготовлена конфигурация
+[docker-compose](docker-compose.yml)
+Для корректной работы, в конфигурационном файле необходимо вместо ip адреса redis, подставить имя сервиса из
+docker-compose:
+
+```yaml
+service:
+  host: 0.0.0.0
+  port: 3000
+redis:
+  ip: redis
+  port: 6379
+  db: 0
+  password:
+```
+
+
 
 
 
