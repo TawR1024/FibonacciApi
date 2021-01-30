@@ -69,6 +69,11 @@ curl -XGET http://127.0.0.1:3000/fibonacci_big -d '{"from":11,"to":14}' -H "Cont
 service:
   host: 127.0.0.1
   port: 3000
+redis:
+  ip: 127.0.0.1
+  port: 6380
+  db: 0
+  password:
 ```
 
 # Service deployment
@@ -76,12 +81,44 @@ service:
 ## Ручная сборка и запуск как systemd unit
 
 1. ```bash git clone https://github.com/TawR1024/FibonacciApi/```
-2. ```bash cd FibonacciApi/cmd/fibonacchi```
-3. ```bash go build -o fibonacciApi .```
-4. ```bash mv fibonacchiApi /usr/share/bin```
-5. Создаём описание юнита см /etc/systemd/system/fibonacci-api.service
-6. Добавляем юнит ```bash systemct daemon-reload```
-7. Создаём пользователя и группу ```bash useradd fibonacci```
-8. Запускаем systemctl start fibonacci-api.service
+2. ```bash go build -o fibonacciApi .```
+3. ```bash mv fibonacchiApi /usr/share/bin```
+4. Создаём описание юнита  [example]( /etc/systemd/system/fibonacci-api.service)
+5. Добавляем юнит ```bash systemct daemon-reload```
+6. Создаём пользователя и группу ```bash useradd fibonacci```
+7. Запускаем systemctl start fibonacci-api.service
+
+## goreleaser
+
+Для обеспечения постоянной сборки приложения под различные платформы при необходимости 
+настроен  [pipeline](.github/workflows/releaseFibonacci.yml)
+
+Для деплоя приложения достаточно скачать необходимый архив.
+
+
+## Docker image
+Запуск приложения можно осуществить в docker контейнере.
+Каждая новая версия собирается и загружается на docker.hub
+
+[pipeline](.github/workflows/build_image.yml)
+
+```bash
+docker pull tawr/fibonacciapi
+```
+
+
+```bash
+ docker run -p 127.0.0.1:3000:3000 \
+ -v /path/to/config/dir/:/etc/fibonacci/ \
+ --name fiboApi tawe/fibonacciapi  
+```
+
+Для запуска приложения в docker в конфигурационном файле необходимо указывать *host:0.0.0.0* вместо *127.0.0.0*
+```yaml
+service:
+  host: 0.0.0.0
+```
+
+
 
 
