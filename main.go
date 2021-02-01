@@ -29,10 +29,13 @@ func main() {
 		_, err := os.Stat(defaultPath)
 		if err != nil {
 			log.Printf("Default config not exist: %s", defaultPath)
-			os.Exit(1)
+			os.Exit(1) //Stop running if config not exist
 		}
 		log.Printf("Using default config path: %s", defaultPath)
-		conf, _ = config.New(&defaultPath)
+		conf, err = config.New(&defaultPath)
+		if err != nil {
+			os.Exit(1) // Stop if error during config creation
+		}
 	}
 
 	router := chi.NewRouter()
